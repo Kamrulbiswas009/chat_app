@@ -9,9 +9,19 @@ class UserRepository {
   UserRepository({UserProvider? userProvider})
       : _userProvider = userProvider ?? UserProvider();
 
-  Future<ApiResult<List<UserModel>>> getUsers({int page = 1, int limit = 50}) async {
+  Future<ApiResult<List<UserModel>>> getUsers({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    bool excludeSelf = true,
+  }) async {
     try {
-      final list = await _userProvider.getUsers(page: page, limit: limit);
+      final list = await _userProvider.getUsers(
+        page: page,
+        limit: limit,
+        search: search,
+        excludeSelf: excludeSelf,
+      );
       return Success(list);
     } catch (e) {
       if (e is ApiException) return Failure(e.message, statusCode: e.statusCode);
