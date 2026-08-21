@@ -34,6 +34,7 @@ class SocketService extends GetxService {
     }
     _storage.isAuthenticated.listen((authenticated) {
       if (authenticated) {
+        disconnect();
         connect();
       } else {
         disconnect();
@@ -46,17 +47,19 @@ class SocketService extends GetxService {
     final token = _storage.getAccessToken();
     final serverUrl = _storage.getBaseUrl();
 
+    if (token == null || token.trim().isEmpty) return;
     if (_socket != null && _socket!.connected) return;
 
     try {
+      final cleanToken = token.trim();
       _socket = io.io(
         serverUrl,
         io.OptionBuilder()
             .setTransports(['websocket'])
             .disableAutoConnect()
-            .setAuth({'token': token ?? ''})
+            .setAuth({'token': cleanToken})
             .setExtraHeaders({
-              if (token != null) 'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $cleanToken',
             })
             .enableReconnection()
             .setReconnectionDelay(1000)

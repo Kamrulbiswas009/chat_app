@@ -40,6 +40,16 @@ class SignupController extends GetxController {
     isLoading.value = false;
 
     if (result is Success<AuthResponseModel>) {
+      Get.snackbar(
+        'Success',
+        'Welcome, ${result.data.user.name}!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFF10B981),
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 2),
+      );
       Get.offAllNamed(AppRoutes.dashboard);
     } else if (result is Failure<AuthResponseModel>) {
       Get.snackbar(

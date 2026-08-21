@@ -189,6 +189,20 @@ class ConversationListView extends GetView<ConversationListController> {
                                     : 'Start a conversation with friends or clients',
                                 style: AppTextStyles.bodyMedium,
                               ),
+                              if (!controller.isSearching.value) ...[
+                                const SizedBox(height: 20),
+                                ElevatedButton.icon(
+                                  onPressed: controller.openNewChat,
+                                  icon: const Icon(Icons.person_add_rounded, size: 18, color: Colors.white),
+                                  label: const Text('Find Users & Chat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
