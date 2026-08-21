@@ -42,21 +42,22 @@ class StorageService extends GetxService {
   String? getAccessToken() => _prefs.getString(_keyAccessToken);
 
   Future<void> setAccessToken(String? token) async {
-    if (token == null) {
+    if (token == null || token.trim().isEmpty) {
       await _prefs.remove(_keyAccessToken);
+      isAuthenticated.value = false;
     } else {
-      await _prefs.setString(_keyAccessToken, token);
+      await _prefs.setString(_keyAccessToken, token.trim());
+      isAuthenticated.value = true;
     }
-    isAuthenticated.value = token != null;
   }
 
   String? getRefreshToken() => _prefs.getString(_keyRefreshToken);
 
   Future<void> setRefreshToken(String? token) async {
-    if (token == null) {
+    if (token == null || token.trim().isEmpty) {
       await _prefs.remove(_keyRefreshToken);
     } else {
-      await _prefs.setString(_keyRefreshToken, token);
+      await _prefs.setString(_keyRefreshToken, token.trim());
     }
   }
 

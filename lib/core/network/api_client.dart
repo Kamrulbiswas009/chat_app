@@ -53,12 +53,28 @@ class ApiClient {
                 );
 
                 final data = response.data is Map ? response.data : {'data': response.data};
-                final newAccessToken = data['data']?['accessToken'] ?? data['accessToken'] ?? data['access_token'] ?? data['token'];
-                final newRefreshToken = data['data']?['refreshToken'] ?? data['refreshToken'] ?? data['refresh_token'];
+                final rootData = data['data'] is Map ? data['data'] : data;
+                final tokensData = rootData['tokens'] is Map ? rootData['tokens'] : (data['tokens'] is Map ? data['tokens'] : null);
                 
-                if (newAccessToken != null) {
+                final newAccessToken = tokensData?['accessToken'] ?? 
+                    tokensData?['access_token'] ?? 
+                    rootData['accessToken'] ?? 
+                    rootData['access_token'] ?? 
+                    rootData['token'] ?? 
+                    data['accessToken'] ?? 
+                    data['access_token'] ?? 
+                    data['token'];
+
+                final newRefreshToken = tokensData?['refreshToken'] ?? 
+                    tokensData?['refresh_token'] ?? 
+                    rootData['refreshToken'] ?? 
+                    rootData['refresh_token'] ?? 
+                    data['refreshToken'] ?? 
+                    data['refresh_token'];
+                
+                if (newAccessToken != null && newAccessToken.toString().isNotEmpty) {
                   await _storage.setAccessToken(newAccessToken.toString());
-                  if (newRefreshToken != null) {
+                  if (newRefreshToken != null && newRefreshToken.toString().isNotEmpty) {
                     await _storage.setRefreshToken(newRefreshToken.toString());
                   }
 
