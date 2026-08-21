@@ -10,17 +10,49 @@ class UserProvider {
   final MockBackendService _mockBackend = MockBackendService();
   final StorageService _storage = StorageService.to;
 
-  Future<List<UserModel>> getUsers({int page = 1, int limit = 50}) async {
+  Future<List<UserModel>> getUsers({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    bool excludeSelf = true,
+  }) async {
     if (_storage.useMockBackend.value) {
       return _mockBackend.getUsers();
     }
     try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+        'excludeSelf': excludeSelf,
+      };
+      if (search != null && search.trim().isNotEmpty) {
+        queryParams['search'] = search.trim();
+      }
+
       final response = await _apiClient.dio.get(
         ApiConstants.users,
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: queryParams,
       );
-      final List list = response.data is List ? response.data : (response.data['data'] ?? []);
-      return list.map((item) => UserModel.fromJson(item)).toList();
+
+      dynamic rawData = response.data;
+      if (rawData is Map) {
+        if (rawData['data'] != null) {
+          rawData = rawData['data'];
+        }
+      }
+
+      List list = [];
+      if (rawData is List) {
+        list = rawData;
+      } else if (rawData is Map) {
+        if (rawData['users'] is List) {
+          list = rawData['users'];
+        } else if (rawData['data'] is List) {
+          list = rawData['data'];
+        }
+      }
+
+      return list.map((item) => UserModel.fromJson(Map<String, dynamic>.from(item))).toList();
     } catch (e) {
       throw _apiClient.handleError(e);
     }
@@ -32,27 +64,16 @@ class UserProvider {
     }
     try {
       final response = await _apiClient.dio.get(ApiConstants.userDetail(id));
-      final data = response.data is Map<String, dynamic> ? response.data : response.data['data'];
-      return UserModel.fromJson(data);
+      final dynamic raw = response.data;
+      final data = (raw is Map && raw['data'] != null) ? raw['data'] : raw;
+      return UserModel.fromJson(Map<String, dynamic>.from(data));
     } catch (e) {
       throw _apiClient.handleError(e);
     }
   }
 
   Future<List<UserModel>> searchUsers(String query, {int limit = 30}) async {
-    if (_storage.useMockBackend.value) {
-      return _mockBackend.searchUsers(query);
-    }
-    try {
-      final response = await _apiClient.dio.get(
-        ApiConstants.searchUsers,
-        queryParameters: {'q': query, 'limit': limit},
-      );
-      final List list = response.data is List ? response.data : (response.data['data'] ?? []);
-      return list.map((item) => UserModel.fromJson(item)).toList();
-    } catch (e) {
-      throw _apiClient.handleError(e);
-    }
+    return getUsers(search: query, excludeSelf: true, limit: limit);
   }
 
   Future<UserModel> updateProfile({String? name, String? bio, String? avatar}) async {
