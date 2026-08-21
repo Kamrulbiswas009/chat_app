@@ -14,13 +14,12 @@ class EditMessageDialog {
     required Function(bool deleteForEveryone) onDelete,
   }) {
     Get.bottomSheet(
-      Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
+      Material(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -68,8 +67,9 @@ class EditMessageDialog {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   static void _showEditDialog(String currentText, Function(String) onEdit) {
     final controller = TextEditingController(text: currentText);

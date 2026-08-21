@@ -29,10 +29,12 @@ class UserModel {
       isOnline: json['is_online'] == true || json['isOnline'] == true,
       lastSeenAt: json['last_seen_at'] != null 
           ? DateTime.tryParse(json['last_seen_at'].toString()) 
-          : (json['lastSeenAt'] != null ? DateTime.tryParse(json['lastSeenAt'].toString()) : null),
+          : (json['lastSeenAt'] != null 
+              ? DateTime.tryParse(json['lastSeenAt'].toString()) 
+              : (json['lastSeen'] != null ? DateTime.tryParse(json['lastSeen'].toString()) : null)),
       createdAt: json['created_at'] != null 
           ? DateTime.tryParse(json['created_at'].toString()) 
-          : null,
+          : (json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null),
     );
   }
 
